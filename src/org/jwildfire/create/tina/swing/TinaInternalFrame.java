@@ -16,6 +16,7 @@
 */
 package org.jwildfire.create.tina.swing;
 
+import org.jwildfire.evolution.swing.EvolutionPanel;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -10903,6 +10904,7 @@ public class TinaInternalFrame extends JInternalFrame {
       rootTabbedPane.addTab("Dancing Flames Movies ", new ImageIcon(TinaInternalFrame.class.getResource("/org/jwildfire/swing/icons/new/kipina.png")), getPanel_36(), null);
       rootTabbedPane.addTab("Batch Flame Renderer ", new ImageIcon(TinaInternalFrame.class.getResource("/org/jwildfire/swing/icons/new/images.png")), getBatchRenderPanel(), null);
       rootTabbedPane.addTab("3DMesh Generation ", new ImageIcon(TinaInternalFrame.class.getResource("/org/jwildfire/swing/icons/new/sports-soccer.png")), getPanel_88(), null);
+      rootTabbedPane.addTab("Evolution ", new ImageIcon(TinaInternalFrame.class.getResource("/org/jwildfire/evolution/swing/icons/evo.png")), getPanel_Evo(), null);
       // "FFmpeg Video Encoder" "emblem-videos.png"
       JPanel helpPanel = new JPanel();
       rootTabbedPane.addTab("Hints, Help and About ", new ImageIcon(TinaInternalFrame.class.getResource("/org/jwildfire/swing/icons/new/dialog-information-3.png")), helpPanel, null);
@@ -24848,6 +24850,10 @@ public class TinaInternalFrame extends JInternalFrame {
 
   public JButton getRelWeightsResetAllButton() {
     return relWeightsResetAllButton;
+  }
+
+  private JPanel getPanel_Evo() {
+    return new EvolutionPanel();
   }
 } //  @jve:decl-index=0:visual-constraint="10,10"
 
