@@ -22,10 +22,12 @@ repositories {
 }
 sourceCompatibility = 1.8
 version = 'latest-SNAPSHOT'
+ext.mainClass = 'org.jwildfire.swing.Desktop'
 jar {
     manifest {
         attributes 'Implementation-Title': 'JWildFire',
-                   'Implementation-Version': version
+                   'Implementation-Version': version,
+                   'Main-Class': 'org.jwildfire.swing.Desktop'
     }
 }
 findbugs{
@@ -52,9 +54,18 @@ sourceSets {
         java {
             srcDir 'src'
         }
+        resources {
+            srcDir 'src'
+            include '**/*.png'
+            include '**/*.gif'
+            include '**/*.jpg'
+            include '**/*.txt'
+            include '**/*.html'
+            include '**/*.flame'
+        }
     }
     test {
-   		java {
+            java {
         	srcDir 'test/src'
         }
     }
