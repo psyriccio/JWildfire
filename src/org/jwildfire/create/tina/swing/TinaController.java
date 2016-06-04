@@ -178,6 +178,9 @@ public class TinaController implements FlameHolder, LayerHolder, ScriptRunnerEnv
   static final double SLIDER_SCALE_LIGHTPOS = 100.0;
   static final double SLIDER_SCALE_BLUR_FALLOFF = 10.0;
 
+  //Evolution module hack for a minimal code affection
+  public static TinaController mainTinaController = null;
+  ///
   private DancingFractalsController dancingFractalsController;
   private MutaGenController mutaGenController;
   private MeshGenController meshGenController;
@@ -227,6 +230,11 @@ public class TinaController implements FlameHolder, LayerHolder, ScriptRunnerEnv
   private File scriptPropFile = new File(System.getProperty("user.home"), SCRIPT_PROPS_FILE);
 
   public TinaController(TinaControllerParameter parameterObject) {
+    
+    if(mainTinaController == null) {
+      TinaController.mainTinaController = this;
+    }
+    
     tinaFrame = parameterObject.pTinaFrame;
     tinaFrameTitle = tinaFrame.getTitle();
     errorHandler = parameterObject.pErrorHandler;
