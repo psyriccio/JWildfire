@@ -15,6 +15,7 @@ import org.jgap.impl.BooleanGene;
 import org.jgap.impl.CompositeGene;
 import org.jgap.impl.DefaultConfiguration;
 import org.jgap.impl.DoubleGene;
+import org.jgap.impl.GaussianRandomGenerator;
 import org.jgap.impl.IntegerGene;
 import org.jwildfire.create.tina.base.Constants;
 import org.jwildfire.create.tina.base.Flame;
@@ -366,6 +367,9 @@ public class FlameChromosomeCoder {
       }
 
       fillModWeightGene((CompositeGene) gene.geneAt(51+(9*2)+2), val.getModifiedWeights());
+    
+    } else {
+      gene.setToRandomValue(new GaussianRandomGenerator());
     }
     
   }
@@ -556,25 +560,25 @@ public class FlameChromosomeCoder {
   }
   
   public Chromosome constructSampleChromosome() throws InvalidConfigurationException {
-    Gene[] genes = new Gene[42];
-    for(int k = 0; k <= 9; k++) {
+    Gene[] genes = new Gene[82];
+    for(int k = 0; k <= 19; k++) {
       genes[(k*2)] = new BooleanGene(conf); // on/off
       genes[(k*2)+1] = constructXFormSampleGene(); //XForms
     }
-    for(int k = 10; k <= 19; k++) {
+    for(int k = 20; k <= 39; k++) {
       genes[(k*2)] = new BooleanGene(conf); // on/off
       genes[(k*2)+1] = constructXFormSampleGene(); //final XForms
     }
-    genes[(19*2)+2] = constructRGBPaletteSampleGene();
-    genes[(19*2)+3] = constructCameraSampleChromosome();
+    genes[(39*2)+2] = constructRGBPaletteSampleGene();
+    genes[(39*2)+3] = constructCameraSampleChromosome();
     Chromosome sample = new Chromosome(conf, genes);
     return sample;
   }
 
   public Chromosome createChromosome(Flame flame) throws InvalidConfigurationException {
     
-    Gene[] genes = new Gene[42];
-    for(int k = 0; k <= 9; k++) {
+    Gene[] genes = new Gene[82];
+    for(int k = 0; k <= 19; k++) {
       XForm frm = null;
       try {
         frm = flame.getLayers().get(0).getXForms().get(k);
@@ -585,10 +589,10 @@ public class FlameChromosomeCoder {
       genes[(k*2)+1] = constructXFormSampleGene();
       fillXFormGene((CompositeGene) genes[(k*2)+1], frm);
     }
-    for(int k = 10; k <= 19; k++) {
+    for(int k = 20; k <= 39; k++) {
       XForm frm = null;
       try {
-        frm = flame.getLayers().get(0).getFinalXForms().get(k-10);
+        frm = flame.getLayers().get(0).getFinalXForms().get(k-20);
       } catch (Exception ex) {
         frm = null;
       }
@@ -596,10 +600,10 @@ public class FlameChromosomeCoder {
       genes[(k*2)+1] = constructXFormSampleGene();
       fillXFormGene((CompositeGene) genes[(k*2)+1], frm);
     }
-    genes[(19*2)+2] = constructRGBPaletteSampleGene();
-    fillRGBPaletteGene((CompositeGene) genes[(19*2)+2], flame.getLayers().get(0).getPalette());
-    genes[(19*2)+3] = constructCameraSampleChromosome();
-    fillCameraGene((CompositeGene) genes[(19*2)+3], flame);
+    genes[(39*2)+2] = constructRGBPaletteSampleGene();
+    fillRGBPaletteGene((CompositeGene) genes[(39*2)+2], flame.getLayers().get(0).getPalette());
+    genes[(39*2)+3] = constructCameraSampleChromosome();
+    fillCameraGene((CompositeGene) genes[(39*2)+3], flame);
     
     return new Chromosome(conf, genes);
     
@@ -609,20 +613,20 @@ public class FlameChromosomeCoder {
     Flame fl = new Flame();
     Gene[] genes = chr.getGenes();
 
-    for(int k = 0; k <= 9; k++) {
+    for(int k = 0; k <= 19; k++) {
       if((boolean) genes[(k*2)].getAllele()) {
         XForm frm = createXForm((CompositeGene) genes[(k*2)+1]);
         fl.getLayers().get(0).getXForms().add(frm);
       }
     }
-    for(int k = 10; k <= 19; k++) {
+    for(int k = 20; k <= 39; k++) {
       if((boolean) genes[(k*2)].getAllele()) {
         XForm frm = createXForm((CompositeGene) genes[(k*2)+1]);
         fl.getLayers().get(0).getFinalXForms().add(frm);
       }
     }
-    fl.getLayers().get(0).setPalette(createRGBPallete((CompositeGene) genes[(19*2)+2]));
-    setCamera((CompositeGene) genes[(19*2)+3], fl);
+    fl.getLayers().get(0).setPalette(createRGBPallete((CompositeGene) genes[(39*2)+2]));
+    setCamera((CompositeGene) genes[(39*2)+3], fl);
     
     return fl;
     
