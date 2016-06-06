@@ -147,7 +147,7 @@ public class EvolutionPanel extends JPanel implements ErrorHandler, ProgressUpda
     try {
       Chromosome mutchr = coder.createChromosome(currentFlame);
       for(Gene gene : mutchr.getGenes()) {
-        
+        mutateIt(gene);
       }
       Flame mutated = coder.createFlame(mutchr);
       try {
