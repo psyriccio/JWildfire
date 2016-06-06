@@ -21,6 +21,7 @@ import org.jwildfire.create.tina.base.Flame;
 import org.jwildfire.create.tina.base.XForm;
 import org.jwildfire.create.tina.palette.RGBColor;
 import org.jwildfire.create.tina.palette.RGBPalette;
+import org.jwildfire.create.tina.render.dof.DOFBlurShapeType;
 import org.jwildfire.create.tina.variation.LineFunc;
 import org.jwildfire.create.tina.variation.Variation;
 import org.jwildfire.create.tina.variation.VariationFunc;
@@ -426,8 +427,107 @@ public class FlameChromosomeCoder {
     
   }
   
+  public CompositeGene constructCameraSampleChromosome() throws InvalidConfigurationException {
+
+    CompositeGene gene = new CompositeGene(conf);
+    gene.addGene(new DoubleGene(conf)); // camPitch;
+    gene.addGene(new DoubleGene(conf)); // camYaw
+    gene.addGene(new DoubleGene(conf)); // camPerspective
+    gene.addGene(new DoubleGene(conf)); // camRoll
+    gene.addGene(new DoubleGene(conf)); // camZoom
+    gene.addGene(new DoubleGene(conf)); // camPosX
+    gene.addGene(new DoubleGene(conf)); // camPosY
+    gene.addGene(new DoubleGene(conf)); // camPosZ
+    gene.addGene(new DoubleGene(conf)); // camZ
+    gene.addGene(new DoubleGene(conf)); // focusX
+    gene.addGene(new DoubleGene(conf)); // focusY
+    gene.addGene(new DoubleGene(conf)); // focusZ
+    gene.addGene(new DoubleGene(conf)); // dimishZ
+    gene.addGene(new DoubleGene(conf)); // camDOF
+    gene.addGene(new IntegerGene(conf, 0, 11)); // camDOFShape;
+    gene.addGene(new DoubleGene(conf)); // camDOFScale
+    gene.addGene(new DoubleGene(conf)); // camDOFAngle
+    gene.addGene(new DoubleGene(conf)); // camDOFFade
+    gene.addGene(new DoubleGene(conf)); // camDOFParam1
+    gene.addGene(new DoubleGene(conf)); // camDOFParam2
+    gene.addGene(new DoubleGene(conf)); // camDOFParam3
+    gene.addGene(new DoubleGene(conf)); // camDOFParam4
+    gene.addGene(new DoubleGene(conf)); // camDOFParam5
+    gene.addGene(new DoubleGene(conf)); // camDOFParam6
+    gene.addGene(new DoubleGene(conf)); // camDOFExponent
+    gene.addGene(new DoubleGene(conf)); // camDOFArea
+    gene.addGene(new BooleanGene(conf)); // newCamDOF
+    
+    return gene;
+
+  }
+  
+  public void fillCameraGene(CompositeGene gene, Flame val) {
+    
+    gene.geneAt(0).setAllele(val.getCamPitch());
+    gene.geneAt(1).setAllele(val.getCamYaw());
+    gene.geneAt(2).setAllele(val.getCamPerspective());
+    gene.geneAt(3).setAllele(val.getCamRoll());
+    gene.geneAt(4).setAllele(val.getCamZoom());
+    gene.geneAt(5).setAllele(val.getCamPosX());
+    gene.geneAt(6).setAllele(val.getCamPosY());
+    gene.geneAt(7).setAllele(val.getCamPosZ());
+    gene.geneAt(8).setAllele(val.getCamZ());
+    gene.geneAt(9).setAllele(val.getFocusX());
+    gene.geneAt(10).setAllele(val.getFocusY());
+    gene.geneAt(11).setAllele(val.getFocusZ());
+    gene.geneAt(12).setAllele(val.getDimishZ());
+    gene.geneAt(13).setAllele(val.getCamDOF());
+    gene.geneAt(14).setAllele(val.getCamDOFShape().ordinal());
+    gene.geneAt(15).setAllele(val.getCamDOFScale());
+    gene.geneAt(16).setAllele(val.getCamDOFAngle());
+    gene.geneAt(17).setAllele(val.getCamDOFFade());
+    gene.geneAt(18).setAllele(val.getCamDOFParam1());
+    gene.geneAt(19).setAllele(val.getCamDOFParam2());
+    gene.geneAt(20).setAllele(val.getCamDOFParam3());
+    gene.geneAt(21).setAllele(val.getCamDOFParam4());
+    gene.geneAt(22).setAllele(val.getCamDOFParam5());
+    gene.geneAt(23).setAllele(val.getCamDOFParam6());
+    gene.geneAt(24).setAllele(val.getCamDOFExponent());
+    gene.geneAt(25).setAllele(val.getCamDOFArea());
+    gene.geneAt(26).setAllele(val.isNewCamDOF());
+
+  }
+
+  public void setCamera(CompositeGene gene, Flame fl) {
+
+    fl.setCamPitch((double) gene.geneAt(0).getAllele());
+    fl.setCamYaw((double) gene.geneAt(1).getAllele());
+    fl.setCamPerspective((double) gene.geneAt(2).getAllele());
+    fl.setCamRoll((double) gene.geneAt(3).getAllele());
+    fl.setCamZoom((double) gene.geneAt(4).getAllele());
+    fl.setCamZoom((double) gene.geneAt(5).getAllele());
+    fl.setCamPosY((double) gene.geneAt(6).getAllele());
+    fl.setCamPosZ((double) gene.geneAt(7).getAllele());
+    fl.setCamZ((double) gene.geneAt(8).getAllele());
+    fl.setFocusX((double) gene.geneAt(9).getAllele());
+    fl.setFocusY((double) gene.geneAt(10).getAllele());
+    fl.setFocusZ((double) gene.geneAt(11).getAllele());
+    fl.setDimishZ((double) gene.geneAt(12).getAllele());
+    fl.setCamDOF((double) gene.geneAt(13).getAllele());
+    fl.setCamDOFShape(DOFBlurShapeType.values()[(int) gene.geneAt(14).getAllele()]);
+    fl.setCamDOFScale((double) gene.geneAt(15).getAllele());
+    fl.setCamDOFAngle((double) gene.geneAt(16).getAllele());
+    fl.setCamDOFFade((double) gene.geneAt(17).getAllele());
+    fl.setCamDOFParam1((double) gene.geneAt(18).getAllele());
+    fl.setCamDOFParam2((double) gene.geneAt(19).getAllele());
+    fl.setCamDOFParam3((double) gene.geneAt(20).getAllele());
+    fl.setCamDOFParam4((double) gene.geneAt(21).getAllele());
+    fl.setCamDOFParam5((double) gene.geneAt(22).getAllele());
+    fl.setCamDOFParam6((double) gene.geneAt(23).getAllele());
+    fl.setCamDOFExponent((double) gene.geneAt(24).getAllele());
+    fl.setCamDOFArea((double) gene.geneAt(25).getAllele());
+    fl.setNewCamDOF((boolean) gene.geneAt(26).getAllele());
+    
+  }
+  
   public Chromosome constructSampleChromosome() throws InvalidConfigurationException {
-    Gene[] genes = new Gene[21];
+    Gene[] genes = new Gene[42];
     for(int k = 0; k <= 9; k++) {
       genes[(k*2)] = new BooleanGene(conf); // on/off
       genes[(k*2)+1] = constructXFormSampleGene(); //XForms
@@ -437,6 +537,7 @@ public class FlameChromosomeCoder {
       genes[(k*2)+1] = constructXFormSampleGene(); //final XForms
     }
     genes[(19*2)+2] = constructRGBPaletteSampleGene();
+    genes[(19*2)+3] = constructCameraSampleChromosome();
     Chromosome sample = new Chromosome(conf, genes);
     return sample;
   }
@@ -468,6 +569,8 @@ public class FlameChromosomeCoder {
     }
     genes[(19*2)+2] = constructRGBPaletteSampleGene();
     fillRGBPaletteGene((CompositeGene) genes[(19*2)+2], flame.getLayers().get(0).getPalette());
+    genes[(19*2)+3] = constructCameraSampleChromosome();
+    fillCameraGene((CompositeGene) genes[(19*2)+3], flame);
     
     return new Chromosome(conf, genes);
     
@@ -490,6 +593,7 @@ public class FlameChromosomeCoder {
       }
     }
     fl.getLayers().get(0).setPalette(createRGBPallete((CompositeGene) genes[(19*2)+2]));
+    setCamera((CompositeGene) genes[(19*2)+3], fl);
     
     return fl;
     
