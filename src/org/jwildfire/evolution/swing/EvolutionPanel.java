@@ -19,6 +19,8 @@ import javax.swing.plaf.basic.BasicSplitPaneUI;
 import org.jgap.Chromosome;
 import org.jgap.Gene;
 import org.jgap.InvalidConfigurationException;
+import org.jgap.gui.ConfigFrame;
+import org.jgap.gui.GUIManager;
 import org.jgap.impl.CompositeGene;
 import org.jwildfire.base.Prefs;
 import org.jwildfire.create.tina.base.Flame;
@@ -62,6 +64,8 @@ public class EvolutionPanel extends JPanel implements ErrorHandler, ProgressUpda
   
   private final JButton testButton;
   private final JButton mutButton;
+  private final JButton addFromEditorButton;
+  private final JButton crossButton;
   
   private void init() {
     flamePanel.setPreferredSize(new Dimension(320, 240));
@@ -72,6 +76,8 @@ public class EvolutionPanel extends JPanel implements ErrorHandler, ProgressUpda
     this.add(flamePanel);
     this.add(testButton);
     this.add(mutButton);
+    this.add(crossButton);
+    this.add(addFromEditorButton);
     testButton.setText("TEST");
     testButton.setActionCommand("test");
     testButton.addActionListener(this);
@@ -82,6 +88,26 @@ public class EvolutionPanel extends JPanel implements ErrorHandler, ProgressUpda
     mutButton.addActionListener(this);
     mutButton.setMaximumSize(new Dimension(100, 20));
     mutButton.setAlignmentX(LEFT_ALIGNMENT);
+    crossButton.setText("Crossover");
+    crossButton.setActionCommand("crossover");
+    crossButton.addActionListener(this);
+    crossButton.setMaximumSize(new Dimension(100, 20));
+    crossButton.setAlignmentX(LEFT_ALIGNMENT);
+    addFromEditorButton.setText("From editor");
+    addFromEditorButton.setActionCommand("addFromEditor");
+    addFromEditorButton.addActionListener(this);
+    addFromEditorButton.setMaximumSize(new Dimension(100, 20));
+    addFromEditorButton.setAlignmentX(LEFT_ALIGNMENT);
+    FlameChromosomeCoder coder = new FlameChromosomeCoder();
+    try {
+      Chromosome flameSampleChromosome = coder.constructSampleChromosome();
+      GUIManager guiMan = GUIManager.getInstance();
+      guiMan.showFrame(null, coder.getConf());
+    } catch (InvalidConfigurationException ex) {
+      Logger.getLogger(EvolutionPanel.class.getName()).log(Level.SEVERE, null, ex);
+    } catch (Exception ex) {
+      Logger.getLogger(EvolutionPanel.class.getName()).log(Level.SEVERE, null, ex);
+    }
   }
   
   private void doTest() {
@@ -174,10 +200,27 @@ public class EvolutionPanel extends JPanel implements ErrorHandler, ProgressUpda
 
   }
   
+  private void doCrossover() {
+    crossButton.setEnabled(false);
+    crossButton.setEnabled(true);
+  }
+  
+  private void doAddFromEditor() {
+    addFromEditorButton.setEnabled(false);
+    currentFlame = TinaController.mainTinaController.getCurrFlame();
+    flamePanel.setImage(
+      flamePrevHelper.renderFlameImage(true, false, 1), 0, 0, 320, 240
+    );
+    flamePanel.repaint();
+    addFromEditorButton.setEnabled(true);
+  }
+  
   public EvolutionPanel() {
     setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
     testButton = new JButton();
     mutButton = new JButton();
+    crossButton = new JButton();
+    addFromEditorButton = new JButton();
     init();
   }
 
@@ -218,6 +261,24 @@ public class EvolutionPanel extends JPanel implements ErrorHandler, ProgressUpda
         @Override
         public void run() {
           doMutate();
+        }
+      }).start();
+    }
+    if(e.getActionCommand().equals("addFromEditor")) {
+      addFromEditorButton.setEnabled(false);
+      new Thread(new Runnable() {
+        @Override
+        public void run() {
+          doAddFromEditor();
+        }
+      }).start();
+    }
+    if(e.getActionCommand().equals("crossover")) {
+      crossButton.setEnabled(false);
+      new Thread(new Runnable() {
+        @Override
+        public void run() {
+          doCrossover();
         }
       }).start();
     }

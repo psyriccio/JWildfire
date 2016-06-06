@@ -74,6 +74,7 @@ sourceSets {
             include '**/*.txt'
             include '**/*.html'
             include '**/*.flame'
+	    include '**/*.con'
         }
     }
     test {

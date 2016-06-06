@@ -685,5 +685,10 @@ public class FlameChromosomeCoder {
     return fl;
     
   }
+
+  public Configuration getConf() {
+    return conf;
+  }
+  
   
 }
