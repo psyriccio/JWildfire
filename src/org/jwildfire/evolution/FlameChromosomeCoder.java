@@ -59,7 +59,12 @@ public class FlameChromosomeCoder {
     gene.geneAt(0).setAllele(variations.indexOf(val.getName()));
     for(int k = 1; k <= 20; k++) {
       try {
-        gene.geneAt(k).setAllele(val.getParameterValues()[k-1]);
+        if(val.getParameterValues()[k-1] instanceof Integer) {
+          double dval = (double) val.getParameterValues()[k-1];
+          gene.geneAt(k).setAllele(dval);
+        } else {
+          gene.geneAt(k).setAllele(val.getParameterValues()[k-1]);
+        }
       } catch (Exception ex) {
         gene.geneAt(k).setAllele(0.0d);
       }
@@ -71,7 +76,11 @@ public class FlameChromosomeCoder {
     if( vfunc != null) {
       for(int k = 1; k <= 20; k++) {
         try {
-          vfunc.setParameter(vfunc.getParameterNames()[k-1], (double) gene.geneAt(k).getAllele());
+          if(vfunc.getParameter(vfunc.getParameterNames()[k-1]) instanceof Integer) {
+            vfunc.setParameter(vfunc.getParameterNames()[k-1], (int) Math.round((double) gene.geneAt(k).getAllele()));
+          } else {
+            vfunc.setParameter(vfunc.getParameterNames()[k-1], (double) gene.geneAt(k).getAllele());
+          }
         } catch (Exception ex) {
           // none
         }
@@ -371,6 +380,7 @@ public class FlameChromosomeCoder {
     
     } else {
       gene.setToRandomValue(new GaussianRandomGenerator());
+      gene.geneAt(0).setAllele(0d);
     }
     
   }
@@ -493,6 +503,9 @@ public class FlameChromosomeCoder {
     gene.addGene(new BooleanGene(conf)); // postNoiseFilter
     gene.addGene(new DoubleGene(conf, 0d, 1d)); // postNoiseFilterThreshold
     gene.addGene(new BooleanGene(conf)); // preserveZ
+    gene.addGene(new DoubleGene(conf, 25d, 100d)); // sampleDensity
+    gene.addGene(new DoubleGene(conf, 0d, 10d)); // gamma
+    gene.addGene(new DoubleGene(conf, 0.0002d, 0.2d)); // gammaThreshold
     
     return gene;
 
@@ -541,6 +554,9 @@ public class FlameChromosomeCoder {
     gene.geneAt(38).setAllele(val.isPostNoiseFilter());
     gene.geneAt(39).setAllele(val.getPostNoiseFilterThreshold());
     gene.geneAt(40).setAllele(val.isPreserveZ());
+    gene.geneAt(41).setAllele(val.getSampleDensity());
+    gene.geneAt(42).setAllele(val.getGamma());
+    gene.geneAt(43).setAllele(val.getGammaThreshold());
     
   }
 
@@ -587,6 +603,9 @@ public class FlameChromosomeCoder {
     fl.setPostNoiseFilter((boolean) gene.geneAt(38).getAllele());
     fl.setPostNoiseFilterThreshold((double) gene.geneAt(39).getAllele());
     fl.setPreserveZ((boolean) gene.geneAt(40).getAllele());
+    fl.setSampleDensity((double) gene.geneAt(41).getAllele());
+    fl.setGamma((double) gene.geneAt(42).getAllele());
+    fl.setGammaThreshold((double) gene.geneAt(43).getAllele());
     
   }
   
@@ -647,13 +666,17 @@ public class FlameChromosomeCoder {
     for(int k = 0; k <= 19; k++) {
       if((boolean) genes[(k*2)].getAllele()) {
         XForm frm = createXForm((CompositeGene) genes[(k*2)+1]);
-        fl.getLayers().get(0).getXForms().add(frm);
+        if(frm.getWeight() != 0d) {
+          fl.getLayers().get(0).getXForms().add(frm);
+        }
       }
     }
     for(int k = 20; k <= 39; k++) {
       if((boolean) genes[(k*2)].getAllele()) {
         XForm frm = createXForm((CompositeGene) genes[(k*2)+1]);
-        fl.getLayers().get(0).getFinalXForms().add(frm);
+        if(frm.getWeight() != 0d) {
+          fl.getLayers().get(0).getFinalXForms().add(frm);
+        }
       }
     }
     fl.getLayers().get(0).setPalette(createRGBPallete((CompositeGene) genes[(39*2)+2]));

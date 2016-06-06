@@ -134,7 +134,9 @@ public class EvolutionPanel extends JPanel implements ErrorHandler, ProgressUpda
       }
     } else {
       for(int k = 0; k <= gene.size()-1; k++) {
-        gene.applyMutation(k, 0.5d);
+        if(Math.random() > 0.7d) {
+          gene.applyMutation(k, 0.05d);
+        }
       }
     }
   }
@@ -147,7 +149,9 @@ public class EvolutionPanel extends JPanel implements ErrorHandler, ProgressUpda
     try {
       Chromosome mutchr = coder.createChromosome(currentFlame);
       for(Gene gene : mutchr.getGenes()) {
-        mutateIt(gene);
+        if(Math.random() > 0.7d) {
+          mutateIt(gene);
+        }
       }
       Flame mutated = coder.createFlame(mutchr);
       try {
