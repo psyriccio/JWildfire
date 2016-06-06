@@ -482,6 +482,9 @@ public class FlameChromosomeCoder {
     gene.addGene(new DoubleGene(conf)); // PixelsPerUnit
     gene.addGene(new IntegerGene(conf)); // width
     gene.addGene(new IntegerGene(conf)); // height
+    gene.addGene(new DoubleGene(conf)); // camPosX
+    gene.addGene(new DoubleGene(conf)); // camPosY
+    gene.addGene(new DoubleGene(conf)); // camPosZ
     
     return gene;
 
@@ -520,6 +523,9 @@ public class FlameChromosomeCoder {
     gene.geneAt(28).setAllele(val.getPixelsPerUnit());
     gene.geneAt(29).setAllele(val.getWidth());
     gene.geneAt(30).setAllele(val.getHeight());
+    gene.geneAt(31).setAllele(val.getCamPosX());
+    gene.geneAt(32).setAllele(val.getCamPosY());
+    gene.geneAt(33).setAllele(val.getCamPosZ());
 
   }
 
@@ -556,6 +562,9 @@ public class FlameChromosomeCoder {
     fl.setPixelsPerUnit((double) gene.geneAt(28).getAllele());
     fl.setWidth((int) gene.geneAt(29).getAllele());
     fl.setHeight((int) gene.geneAt(30).getAllele());
+    fl.setCamPosX((double) gene.geneAt(31).getAllele());
+    fl.setCamPosY((double) gene.geneAt(32).getAllele());
+    fl.setCamPosZ((double) gene.geneAt(33).getAllele());
     
   }
   
