@@ -75,12 +75,12 @@ public class EvolutionPanel extends JPanel implements ErrorHandler, ProgressUpda
     testButton.setText("TEST");
     testButton.setActionCommand("test");
     testButton.addActionListener(this);
-    testButton.setMaximumSize(new Dimension(50, 20));
+    testButton.setMaximumSize(new Dimension(100, 20));
     testButton.setAlignmentX(LEFT_ALIGNMENT);
     mutButton.setText("Mutate");
     mutButton.setActionCommand("mutate");
     mutButton.addActionListener(this);
-    mutButton.setMaximumSize(new Dimension(50, 20));
+    mutButton.setMaximumSize(new Dimension(100, 20));
     mutButton.setAlignmentX(LEFT_ALIGNMENT);
   }
   
