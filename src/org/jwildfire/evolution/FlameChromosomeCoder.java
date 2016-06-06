@@ -56,7 +56,11 @@ public class FlameChromosomeCoder {
   public void fillVariationFuncGene(CompositeGene gene, VariationFunc val) {
     gene.geneAt(0).setAllele(variations.indexOf(val.getName()));
     for(int k = 1; k <= 20; k++) {
-      gene.geneAt(k).setAllele(val.getParameterValues()[k-1]);
+      try {
+        gene.geneAt(k).setAllele(val.getParameterValues()[k-1]);
+      } catch (Exception ex) {
+        gene.geneAt(k).setAllele(0.0d);
+      }
     }
   }
   
@@ -64,7 +68,11 @@ public class FlameChromosomeCoder {
     VariationFunc vfunc = VariationFuncList.getVariationFuncInstance(variations.get((int) gene.geneAt(0).getAllele()));
     if( vfunc != null) {
       for(int k = 1; k <= 20; k++) {
-        vfunc.setParameter(vfunc.getParameterNames()[k-1], (double) gene.geneAt(k).getAllele());
+        try {
+          vfunc.setParameter(vfunc.getParameterNames()[k-1], (double) gene.geneAt(k).getAllele());
+        } catch (Exception ex) {
+          // none
+        }
       }
       return vfunc;
     }
@@ -85,17 +93,22 @@ public class FlameChromosomeCoder {
       gene.geneAt(1).setAllele(val.getAmount());
       fillVariationFuncGene((CompositeGene) gene.geneAt(2), val.getFunc());
     } else {
-      gene.geneAt(0).setAllele(0.0d);
+      gene.geneAt(0).setAllele(0);
       gene.geneAt(1).setAllele(0.0d);
       fillVariationFuncGene((CompositeGene) gene.geneAt(2), new LineFunc());
     }
   }
   
   public Variation createVariation(CompositeGene gene) {
-    Variation var = new Variation();
-    var.setPriority((int) gene.geneAt(0).getAllele());
-    var.setAmount((double) gene.geneAt(1).getAllele());
-    var.setFunc(createVariationFunc((CompositeGene) gene.geneAt(2)));
+    Variation var = null;
+    int prio = (int) gene.geneAt(0).getAllele();
+    double amo = (double) gene.geneAt(1).getAllele();
+    if(prio != 0 || amo != 0.0) {
+      var = new Variation();
+      var.setPriority(prio);
+      var.setAmount(amo);
+      var.setFunc(createVariationFunc((CompositeGene) gene.geneAt(2)));
+    }
     return var;
   }
   
@@ -285,74 +298,76 @@ public class FlameChromosomeCoder {
 
   public void fillXFormGene(CompositeGene gene, XForm val) {
     
-    gene.geneAt(0).setAllele(val.getWeight());
-    gene.geneAt(1).setAllele(val.getColor());
-    gene.geneAt(2).setAllele(val.getColorSymmetry());
-    gene.geneAt(3).setAllele(val.getModGamma());
-    gene.geneAt(4).setAllele(val.getModGammaSpeed());
-    gene.geneAt(5).setAllele(val.getModContrast());
-    gene.geneAt(6).setAllele(val.getModContrastSpeed());
-    gene.geneAt(7).setAllele(val.getModSaturation());
-    gene.geneAt(8).setAllele(val.getModSaturationSpeed());
+    if(val != null) {
+      gene.geneAt(0).setAllele(val.getWeight());
+      gene.geneAt(1).setAllele(val.getColor());
+      gene.geneAt(2).setAllele(val.getColorSymmetry());
+      gene.geneAt(3).setAllele(val.getModGamma());
+      gene.geneAt(4).setAllele(val.getModGammaSpeed());
+      gene.geneAt(5).setAllele(val.getModContrast());
+      gene.geneAt(6).setAllele(val.getModContrastSpeed());
+      gene.geneAt(7).setAllele(val.getModSaturation());
+      gene.geneAt(8).setAllele(val.getModSaturationSpeed());
   
-    gene.geneAt(9).setAllele(val.getXYCoeff00());
-    gene.geneAt(10).setAllele(val.getXYCoeff01());
-    gene.geneAt(11).setAllele(val.getXYCoeff10());
-    gene.geneAt(12).setAllele(val.getXYCoeff11());
-    gene.geneAt(13).setAllele(val.getXYCoeff20());
-    gene.geneAt(14).setAllele(val.getXYCoeff21());
-    gene.geneAt(15).setAllele(val.getXYPostCoeff00());
-    gene.geneAt(16).setAllele(val.getXYPostCoeff01());
-    gene.geneAt(17).setAllele(val.getXYPostCoeff10());
-    gene.geneAt(18).setAllele(val.getXYPostCoeff11());
-    gene.geneAt(19).setAllele(val.getXYPostCoeff20());
-    gene.geneAt(20).setAllele(val.getXYPostCoeff21());
-    gene.geneAt(21).setAllele(val.isHasXYPostCoeffs());
-    gene.geneAt(22).setAllele(val.isHasXYCoeffs());
+      gene.geneAt(9).setAllele(val.getXYCoeff00());
+      gene.geneAt(10).setAllele(val.getXYCoeff01());
+      gene.geneAt(11).setAllele(val.getXYCoeff10());
+      gene.geneAt(12).setAllele(val.getXYCoeff11());
+      gene.geneAt(13).setAllele(val.getXYCoeff20());
+      gene.geneAt(14).setAllele(val.getXYCoeff21());
+      gene.geneAt(15).setAllele(val.getXYPostCoeff00());
+      gene.geneAt(16).setAllele(val.getXYPostCoeff01());
+      gene.geneAt(17).setAllele(val.getXYPostCoeff10());
+      gene.geneAt(18).setAllele(val.getXYPostCoeff11());
+      gene.geneAt(19).setAllele(val.getXYPostCoeff20());
+      gene.geneAt(20).setAllele(val.getXYPostCoeff21());
+      gene.geneAt(21).setAllele(val.isHasXYPostCoeffs());
+      gene.geneAt(22).setAllele(val.isHasXYCoeffs());
 
-    gene.geneAt(23).setAllele(val.getYZCoeff00());
-    gene.geneAt(24).setAllele(val.getYZCoeff01());
-    gene.geneAt(25).setAllele(val.getYZCoeff10());
-    gene.geneAt(26).setAllele(val.getYZCoeff11());
-    gene.geneAt(27).setAllele(val.getYZCoeff20());
-    gene.geneAt(28).setAllele(val.getYZCoeff21());
-    gene.geneAt(29).setAllele(val.getYZPostCoeff00());
-    gene.geneAt(30).setAllele(val.getYZPostCoeff01());
-    gene.geneAt(31).setAllele(val.getYZPostCoeff10());
-    gene.geneAt(32).setAllele(val.getYZPostCoeff11());
-    gene.geneAt(33).setAllele(val.getYZPostCoeff20());
-    gene.geneAt(34).setAllele(val.getYZPostCoeff21());
-    gene.geneAt(35).setAllele(val.isHasYZPostCoeffs());
-    gene.geneAt(36).setAllele(val.isHasYZCoeffs());
+      gene.geneAt(23).setAllele(val.getYZCoeff00());
+      gene.geneAt(24).setAllele(val.getYZCoeff01());
+      gene.geneAt(25).setAllele(val.getYZCoeff10());
+      gene.geneAt(26).setAllele(val.getYZCoeff11());
+      gene.geneAt(27).setAllele(val.getYZCoeff20());
+      gene.geneAt(28).setAllele(val.getYZCoeff21());
+      gene.geneAt(29).setAllele(val.getYZPostCoeff00());
+      gene.geneAt(30).setAllele(val.getYZPostCoeff01());
+      gene.geneAt(31).setAllele(val.getYZPostCoeff10());
+      gene.geneAt(32).setAllele(val.getYZPostCoeff11());
+      gene.geneAt(33).setAllele(val.getYZPostCoeff20());
+      gene.geneAt(34).setAllele(val.getYZPostCoeff21());
+      gene.geneAt(35).setAllele(val.isHasYZPostCoeffs());
+      gene.geneAt(36).setAllele(val.isHasYZCoeffs());
 
-    gene.geneAt(37).setAllele(val.getZXCoeff00());
-    gene.geneAt(38).setAllele(val.getZXCoeff01());
-    gene.geneAt(39).setAllele(val.getZXCoeff10());
-    gene.geneAt(40).setAllele(val.getZXCoeff11());
-    gene.geneAt(41).setAllele(val.getZXCoeff20());
-    gene.geneAt(42).setAllele(val.getZXCoeff21());
-    gene.geneAt(43).setAllele(val.getZXPostCoeff00());
-    gene.geneAt(44).setAllele(val.getZXPostCoeff01());
-    gene.geneAt(45).setAllele(val.getZXPostCoeff10());
-    gene.geneAt(46).setAllele(val.getZXPostCoeff11());
-    gene.geneAt(47).setAllele(val.getZXPostCoeff20());
-    gene.geneAt(48).setAllele(val.getZXPostCoeff21());
-    gene.geneAt(49).setAllele(val.isHasZXPostCoeffs());
-    gene.geneAt(50).setAllele(val.isHasZXCoeffs());
+      gene.geneAt(37).setAllele(val.getZXCoeff00());
+      gene.geneAt(38).setAllele(val.getZXCoeff01());
+      gene.geneAt(39).setAllele(val.getZXCoeff10());
+      gene.geneAt(40).setAllele(val.getZXCoeff11());
+      gene.geneAt(41).setAllele(val.getZXCoeff20());
+      gene.geneAt(42).setAllele(val.getZXCoeff21());
+      gene.geneAt(43).setAllele(val.getZXPostCoeff00());
+      gene.geneAt(44).setAllele(val.getZXPostCoeff01());
+      gene.geneAt(45).setAllele(val.getZXPostCoeff10());
+      gene.geneAt(46).setAllele(val.getZXPostCoeff11());
+      gene.geneAt(47).setAllele(val.getZXPostCoeff20());
+      gene.geneAt(48).setAllele(val.getZXPostCoeff21());
+      gene.geneAt(49).setAllele(val.isHasZXPostCoeffs());
+      gene.geneAt(50).setAllele(val.isHasZXCoeffs());
     
-    for(int k = 0; k <= 9; k++) {
-      Variation var = null;
-      try {
-        var = val.getVariation(k);
-      } catch (Exception ex) {
-        var = null;
+      for(int k = 0; k <= 9; k++) {
+        Variation var = null;
+        try {
+          var = val.getVariation(k);
+        } catch (Exception ex) {
+          var = null;
+        }
+        gene.geneAt(51+(k*2)).setAllele(var != null);
+        fillVariationGene((CompositeGene) gene.geneAt(51+(k*2)+1), var);
       }
-      gene.geneAt(51+(k*2)).setAllele(var != null);
-      fillVariationGene((CompositeGene) gene.geneAt(51+(k*2)+1), var);
+
+      fillModWeightGene((CompositeGene) gene.geneAt(51+(9*2)+2), val.getModifiedWeights());
     }
-
-    fillModWeightGene((CompositeGene) gene.geneAt(51+(9*2)+2), val.getModifiedWeights());
-
+    
   }
 
   public XForm createXForm(CompositeGene gene) {
@@ -417,7 +432,9 @@ public class FlameChromosomeCoder {
     for(int k = 0; k <= 9; k++) {
       if((boolean) gene.geneAt(51+(k*2)).getAllele()) {
         Variation var = createVariation((CompositeGene) gene.geneAt(51+(k*2)+1));
-        frm.addVariation(var);
+        if(var != null) {
+          frm.addVariation(var);
+        }
       }
     }
 
@@ -457,6 +474,10 @@ public class FlameChromosomeCoder {
     gene.addGene(new DoubleGene(conf)); // camDOFExponent
     gene.addGene(new DoubleGene(conf)); // camDOFArea
     gene.addGene(new BooleanGene(conf)); // newCamDOF
+    gene.addGene(new DoubleGene(conf)); // camZoom
+    gene.addGene(new DoubleGene(conf)); // PixelsPerUnit
+    gene.addGene(new IntegerGene(conf)); // width
+    gene.addGene(new IntegerGene(conf)); // height
     
     return gene;
 
@@ -491,6 +512,10 @@ public class FlameChromosomeCoder {
     gene.geneAt(24).setAllele(val.getCamDOFExponent());
     gene.geneAt(25).setAllele(val.getCamDOFArea());
     gene.geneAt(26).setAllele(val.isNewCamDOF());
+    gene.geneAt(27).setAllele(val.getCamZoom());
+    gene.geneAt(28).setAllele(val.getPixelsPerUnit());
+    gene.geneAt(29).setAllele(val.getWidth());
+    gene.geneAt(30).setAllele(val.getHeight());
 
   }
 
@@ -523,6 +548,10 @@ public class FlameChromosomeCoder {
     fl.setCamDOFExponent((double) gene.geneAt(24).getAllele());
     fl.setCamDOFArea((double) gene.geneAt(25).getAllele());
     fl.setNewCamDOF((boolean) gene.geneAt(26).getAllele());
+    fl.setCamZoom((double) gene.geneAt(27).getAllele());
+    fl.setPixelsPerUnit((double) gene.geneAt(28).getAllele());
+    fl.setWidth((int) gene.geneAt(29).getAllele());
+    fl.setHeight((int) gene.geneAt(30).getAllele());
     
   }
   
@@ -544,7 +573,7 @@ public class FlameChromosomeCoder {
 
   public Chromosome createChromosome(Flame flame) throws InvalidConfigurationException {
     
-    Gene[] genes = new Gene[21];
+    Gene[] genes = new Gene[42];
     for(int k = 0; k <= 9; k++) {
       XForm frm = null;
       try {

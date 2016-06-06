@@ -10,12 +10,17 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
+import org.jgap.Chromosome;
+import org.jgap.InvalidConfigurationException;
 import org.jwildfire.base.Prefs;
 import org.jwildfire.create.tina.base.Flame;
+import org.jwildfire.create.tina.io.FlameWriter;
 import org.jwildfire.create.tina.palette.RGBPalette;
 import org.jwildfire.create.tina.randomflame.AllRandomFlameGenerator;
 import org.jwildfire.create.tina.randomflame.RandomFlameGeneratorSampler;
@@ -30,6 +35,7 @@ import org.jwildfire.create.tina.swing.RandomBatchQuality;
 import org.jwildfire.create.tina.swing.TinaController;
 import org.jwildfire.create.tina.swing.flamepanel.FlamePanel;
 import org.jwildfire.create.tina.swing.flamepanel.FlamePanelConfig;
+import org.jwildfire.evolution.FlameChromosomeCoder;
 import org.jwildfire.image.SimpleImage;
 import org.jwildfire.swing.ErrorHandler;
 import org.jwildfire.swing.ImagePanel;
@@ -94,6 +100,21 @@ public class EvolutionPanel extends JPanel implements ErrorHandler, ProgressUpda
     );
     flamePanel.repaint();
     TinaController.mainTinaController.importFlame(currentFlame, true);
+    FlameChromosomeCoder coder = new FlameChromosomeCoder();
+    try {
+      Chromosome chr = coder.createChromosome(currentFlame);
+      Flame decoded = coder.createFlame(chr);
+      TinaController.mainTinaController.importFlame(decoded, true);
+      try {
+        FlameWriter writer = new FlameWriter();
+        writer.writeFlame(currentFlame, "main.flame");
+        writer.writeFlame(decoded, "decoded.flame");
+      } catch (Exception ex) {
+        Logger.getLogger(EvolutionPanel.class.getName()).log(Level.SEVERE, null, ex);
+      }
+    } catch (InvalidConfigurationException ex) {
+        Logger.getLogger(EvolutionPanel.class.getName()).log(Level.SEVERE, null, ex);
+    }
     testButton.setEnabled(true);
   }
   
