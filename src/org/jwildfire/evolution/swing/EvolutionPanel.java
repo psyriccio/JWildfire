@@ -17,7 +17,9 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
 import org.jgap.Chromosome;
+import org.jgap.Gene;
 import org.jgap.InvalidConfigurationException;
+import org.jgap.impl.CompositeGene;
 import org.jwildfire.base.Prefs;
 import org.jwildfire.create.tina.base.Flame;
 import org.jwildfire.create.tina.io.FlameWriter;
@@ -59,6 +61,7 @@ public class EvolutionPanel extends JPanel implements ErrorHandler, ProgressUpda
           );
   
   private final JButton testButton;
+  private final JButton mutButton;
   
   private void init() {
     flamePanel.setPreferredSize(new Dimension(320, 240));
@@ -68,11 +71,17 @@ public class EvolutionPanel extends JPanel implements ErrorHandler, ProgressUpda
     flamePanel.setAlignmentY(TOP_ALIGNMENT);
     this.add(flamePanel);
     this.add(testButton);
+    this.add(mutButton);
     testButton.setText("TEST");
     testButton.setActionCommand("test");
     testButton.addActionListener(this);
     testButton.setMaximumSize(new Dimension(50, 20));
     testButton.setAlignmentX(LEFT_ALIGNMENT);
+    mutButton.setText("Mutate");
+    mutButton.setActionCommand("mutate");
+    mutButton.addActionListener(this);
+    mutButton.setMaximumSize(new Dimension(50, 20));
+    mutButton.setAlignmentX(LEFT_ALIGNMENT);
   }
   
   private void doTest() {
@@ -118,9 +127,51 @@ public class EvolutionPanel extends JPanel implements ErrorHandler, ProgressUpda
     testButton.setEnabled(true);
   }
   
+  private void mutateIt(Gene gene) {
+    if(gene instanceof CompositeGene) {
+      for(Gene child : ((CompositeGene) gene).getGenes()) {
+        mutateIt(child);
+      }
+    } else {
+      gene.applyMutation(0, 0.3d);
+    }
+  }
+  
+  private void doMutate() {
+
+    mutButton.setEnabled(false);
+    
+    FlameChromosomeCoder coder = new FlameChromosomeCoder();
+    try {
+      Chromosome mutchr = coder.createChromosome(currentFlame);
+      for(Gene gene : mutchr.getGenes()) {
+        
+      }
+      Flame mutated = coder.createFlame(mutchr);
+      try {
+        FlameWriter writer = new FlameWriter();
+        writer.writeFlame(mutated, "mutated.flame");
+      } catch (Exception ex) {
+        Logger.getLogger(EvolutionPanel.class.getName()).log(Level.SEVERE, null, ex);
+      }
+      TinaController.mainTinaController.importFlame(mutated, true);
+      currentFlame = mutated;
+      flamePanel.setImage(
+        flamePrevHelper.renderFlameImage(true, false, 1), 0, 0, 320, 240
+      );
+      flamePanel.repaint();
+    } catch (InvalidConfigurationException ex) {
+      Logger.getLogger(EvolutionPanel.class.getName()).log(Level.SEVERE, null, ex);
+    }
+    
+    mutButton.setEnabled(true);
+
+  }
+  
   public EvolutionPanel() {
     setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
     testButton = new JButton();
+    mutButton = new JButton();
     init();
   }
 
@@ -152,6 +203,15 @@ public class EvolutionPanel extends JPanel implements ErrorHandler, ProgressUpda
         @Override
         public void run() {
           doTest();
+        }
+      }).start();
+    }
+    if(e.getActionCommand().equals("mutate")) {
+      mutButton.setEnabled(false);
+      new Thread(new Runnable() {
+        @Override
+        public void run() {
+          doMutate();
         }
       }).start();
     }
