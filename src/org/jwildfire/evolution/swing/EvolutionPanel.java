@@ -133,7 +133,9 @@ public class EvolutionPanel extends JPanel implements ErrorHandler, ProgressUpda
         mutateIt(child);
       }
     } else {
-      gene.applyMutation(0, 0.3d);
+      for(int k = 0; k <= gene.size()-1; k++) {
+        gene.applyMutation(k, 0.5d);
+      }
     }
   }
   
