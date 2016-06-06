@@ -492,7 +492,8 @@ public class FlameChromosomeCoder {
     gene.addGene(new DoubleGene(conf, 0d, 2d)); // antialiasingRadius
     gene.addGene(new BooleanGene(conf)); // postNoiseFilter
     gene.addGene(new DoubleGene(conf, 0d, 1d)); // postNoiseFilterThreshold
-      
+    gene.addGene(new BooleanGene(conf)); // preserveZ
+    
     return gene;
 
   }
@@ -539,6 +540,7 @@ public class FlameChromosomeCoder {
     gene.geneAt(37).setAllele(val.getAntialiasRadius());
     gene.geneAt(38).setAllele(val.isPostNoiseFilter());
     gene.geneAt(39).setAllele(val.getPostNoiseFilterThreshold());
+    gene.geneAt(40).setAllele(val.isPreserveZ());
     
   }
 
@@ -584,6 +586,7 @@ public class FlameChromosomeCoder {
     fl.setAntialiasRadius((double) gene.geneAt(37).getAllele());
     fl.setPostNoiseFilter((boolean) gene.geneAt(38).getAllele());
     fl.setPostNoiseFilterThreshold((double) gene.geneAt(39).getAllele());
+    fl.setPreserveZ((boolean) gene.geneAt(40).getAllele());
     
   }
   
