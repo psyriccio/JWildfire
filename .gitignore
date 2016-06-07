@@ -74,3 +74,4 @@ localsrc
 .gradle/
 build/launcher/
 /.nb-gradle/
+/*.flame

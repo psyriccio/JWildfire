@@ -6,8 +6,6 @@
 package org.jwildfire.evolution.swing;
 
 import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.logging.Level;
@@ -15,12 +13,9 @@ import java.util.logging.Logger;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JPanel;
-import javax.swing.plaf.basic.BasicSplitPaneUI;
 import org.jgap.Chromosome;
 import org.jgap.Gene;
 import org.jgap.InvalidConfigurationException;
-import org.jgap.gui.ConfigFrame;
-import org.jgap.gui.GUIManager;
 import org.jgap.impl.CompositeGene;
 import org.jwildfire.base.Prefs;
 import org.jwildfire.create.tina.base.Flame;
@@ -42,7 +37,6 @@ import org.jwildfire.create.tina.swing.flamepanel.FlamePanelConfig;
 import org.jwildfire.evolution.FlameChromosomeCoder;
 import org.jwildfire.image.SimpleImage;
 import org.jwildfire.swing.ErrorHandler;
-import org.jwildfire.swing.ImagePanel;
 
 /**
  *
@@ -101,10 +95,9 @@ public class EvolutionPanel extends JPanel implements ErrorHandler, ProgressUpda
     FlameChromosomeCoder coder = new FlameChromosomeCoder();
     try {
       Chromosome flameSampleChromosome = coder.constructSampleChromosome();
-      GUIManager guiMan = GUIManager.getInstance();
-      guiMan.showFrame(null, coder.getConf());
-    } catch (InvalidConfigurationException ex) {
-      Logger.getLogger(EvolutionPanel.class.getName()).log(Level.SEVERE, null, ex);
+      for(Gene gene : flameSampleChromosome.getGenes()) {
+        System.out.println(gene.toString());
+      }
     } catch (Exception ex) {
       Logger.getLogger(EvolutionPanel.class.getName()).log(Level.SEVERE, null, ex);
     }

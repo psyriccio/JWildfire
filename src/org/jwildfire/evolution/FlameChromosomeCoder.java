@@ -506,6 +506,8 @@ public class FlameChromosomeCoder {
     gene.addGene(new DoubleGene(conf, 25d, 100d)); // sampleDensity
     gene.addGene(new DoubleGene(conf, 0d, 10d)); // gamma
     gene.addGene(new DoubleGene(conf, 0.0002d, 0.2d)); // gammaThreshold
+    gene.addGene(new DoubleGene(conf, -5d, 5d)); // centreX
+    gene.addGene(new DoubleGene(conf, -5d, 5d)); // centreY
     
     return gene;
 
@@ -557,6 +559,8 @@ public class FlameChromosomeCoder {
     gene.geneAt(41).setAllele(val.getSampleDensity());
     gene.geneAt(42).setAllele(val.getGamma());
     gene.geneAt(43).setAllele(val.getGammaThreshold());
+    gene.geneAt(44).setAllele(val.getCentreX());
+    gene.geneAt(45).setAllele(val.getCentreY());
     
   }
 
@@ -606,6 +610,8 @@ public class FlameChromosomeCoder {
     fl.setSampleDensity((double) gene.geneAt(41).getAllele());
     fl.setGamma((double) gene.geneAt(42).getAllele());
     fl.setGammaThreshold((double) gene.geneAt(43).getAllele());
+    fl.setCentreX((double) gene.geneAt(44).getAllele());
+    fl.setCentreY((double) gene.geneAt(45).getAllele());
     
   }
   
