@@ -6,8 +6,8 @@
 package org.jwildfire.evolution;
 
 import org.jgap.Configuration;
-import org.jgap.Gene;
 import org.jgap.InvalidConfigurationException;
+import org.jgap.Gene;
 import org.jgap.impl.BooleanGene;
 import org.jgap.impl.CompositeGene;
 import org.jgap.impl.DoubleGene;
@@ -21,6 +21,10 @@ import org.jgap.impl.StringGene;
  */
 public abstract class GeneCompositor<T> {
 
+  public static GeneDescriptor getGeneDescriptor(Gene gene) {
+    return GeneDescriptor.ofGene(gene);
+  }
+  
   public class GeneBuilder {
 
     private final CompositeGene gene;
@@ -34,31 +38,6 @@ public abstract class GeneCompositor<T> {
       return gene;
     }
     
-    public GeneBuilder addGene(String name, GeneType type) throws InvalidConfigurationException {
-      Gene newGene = null;
-      switch (type) {
-        case COMPOSITE:
-          newGene = new CompositeGene(getConfiguration());
-          break;
-        case BOOLEAN:
-          newGene = new BooleanGene(getConfiguration());
-          break;
-        case DOUBLE:
-          newGene = new DoubleGene(getConfiguration());
-          break;
-        case INT:
-          newGene = new IntegerGene(getConfiguration());
-          break;
-        case STRING:
-          newGene = new StringGene(getConfiguration());
-          break;
-        default:
-      }
-      gene.setApplicationData(new GeneDescriptor(type, name));
-      gene.addGene(newGene);
-      return this;
-    }
-
     public GeneBuilder addGene(String name, GeneType type, Object min, Object max) throws InvalidConfigurationException {
       Gene newGene = null;
       switch (type) {
@@ -69,19 +48,35 @@ public abstract class GeneCompositor<T> {
           newGene = new BooleanGene(getConfiguration());
           break;
         case DOUBLE:
-          newGene = new DoubleGene(getConfiguration(), (double) min, (double) max);
+          try {
+            newGene = new DoubleGene(getConfiguration(), (double) min, (double) max);
+          } catch (Exception ex) {
+            newGene = new DoubleGene(getConfiguration());
+          }
           break;
         case INT:
-          newGene = new IntegerGene(getConfiguration(), (int) min, (int) max);
+          try {
+            newGene = new IntegerGene(getConfiguration(), (int) min, (int) max);
+          } catch (Exception ex) {
+            newGene = new IntegerGene(getConfiguration());
+          }
           break;
         case STRING:
-          newGene = new StringGene(getConfiguration(), (int) min, (int) max);
+          try {
+            newGene = new StringGene(getConfiguration(), (int) min, (int) max);
+          } catch (Exception ex) {
+            newGene = new StringGene(getConfiguration());
+          }
           break;
         default:
       }
       gene.setApplicationData(new GeneDescriptor(type, name));
       gene.addGene(newGene);
       return this;
+    }
+
+    public GeneBuilder addGene(String name, GeneType type) throws InvalidConfigurationException {
+      return this.addGene(name, type, null, null);
     }
 
     public GeneBuilder addGene(String name, GeneType type, int min, int max) throws InvalidConfigurationException {

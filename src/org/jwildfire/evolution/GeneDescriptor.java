@@ -5,12 +5,18 @@
  */
 package org.jwildfire.evolution;
 
+import org.jgap.Gene;
+
 /**
  *
  * @author psyriccio
  */
 public class GeneDescriptor {
 
+  public static GeneDescriptor ofGene(Gene gene) {
+    return (GeneDescriptor) gene.getApplicationData();
+  }
+  
   private final GeneCompositor.GeneType type;
   private final String name;
 
@@ -19,6 +25,14 @@ public class GeneDescriptor {
     this.name = name;
   }
 
+  public GeneCompositor.GeneType getType() {
+    return type;
+  }
+
+  public String getName() {
+    return name;
+  }
+  
   @Override
   public String toString() {
     return name + "@" + Integer.toHexString(this.hashCode()) + ":(" + type.toString() + ")";
