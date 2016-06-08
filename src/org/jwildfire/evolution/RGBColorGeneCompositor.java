@@ -16,10 +16,6 @@ import org.jwildfire.create.tina.palette.RGBColor;
  */
 public class RGBColorGeneCompositor extends GeneCompositor<RGBColor> {
 
-  public RGBColorGeneCompositor() {
-    super(RGBColor.class);
-  }
-
   public RGBColorGeneCompositor(Configuration configuration) {
     super(RGBColor.class, configuration);
   }
