@@ -5,6 +5,7 @@
  */
 package org.jwildfire.evolution;
 
+import java.util.Optional;
 import org.jgap.Configuration;
 import org.jgap.InvalidConfigurationException;
 import org.jgap.Gene;
@@ -13,6 +14,7 @@ import org.jgap.impl.CompositeGene;
 import org.jgap.impl.DoubleGene;
 import org.jgap.impl.IntegerGene;
 import org.jgap.impl.StringGene;
+import org.jgap.impl.FixedBinaryGene;
 
 /**
  *
@@ -21,7 +23,7 @@ import org.jgap.impl.StringGene;
  */
 public abstract class GeneCompositor<T> {
 
-  public static GeneDescriptor getGeneDescriptor(Gene gene) {
+  public static Optional<GeneDescriptor> getGeneDescriptor(Gene gene) {
     return GeneDescriptor.ofGene(gene);
   }
   
@@ -31,6 +33,11 @@ public abstract class GeneCompositor<T> {
 
     public GeneBuilder(String name) throws InvalidConfigurationException {
       gene = new CompositeGene(getConfiguration());
+      gene.setApplicationData(new GeneDescriptor(GeneType.COMPOSITE, name));
+    }
+
+    public GeneBuilder(String name, CompositeGene gene) throws InvalidConfigurationException {
+      this.gene = gene;
       gene.setApplicationData(new GeneDescriptor(GeneType.COMPOSITE, name));
     }
     
@@ -48,25 +55,29 @@ public abstract class GeneCompositor<T> {
           newGene = new BooleanGene(getConfiguration());
           break;
         case DOUBLE:
-          try {
+          if(min != null || max != null) {
             newGene = new DoubleGene(getConfiguration(), (double) min, (double) max);
-          } catch (Exception ex) {
+          } else {
             newGene = new DoubleGene(getConfiguration());
           }
           break;
         case INT:
-          try {
+          if(min != null || max != null) {
             newGene = new IntegerGene(getConfiguration(), (int) min, (int) max);
-          } catch (Exception ex) {
+          } else {
             newGene = new IntegerGene(getConfiguration());
           }
           break;
         case STRING:
-          try {
+          if(min != null || max != null) {
             newGene = new StringGene(getConfiguration(), (int) min, (int) max);
-          } catch (Exception ex) {
+          } else {
             newGene = new StringGene(getConfiguration());
           }
+          break;
+        case BINARY:
+          int length = min != null ? (int) min : (int) max;
+          newGene = new FixedBinaryGene(configuration, length);
           break;
         default:
       }
@@ -86,27 +97,32 @@ public abstract class GeneCompositor<T> {
     public GeneBuilder addGene(String name, GeneType type, double min, double max) throws InvalidConfigurationException {
       return this.addGene(name, type, (Object) min, (Object) max);
     }
+   
+    protected Optional<Gene> getGene(String name) {
+      for(Gene subgene : gene.getGenes()) {
+       if(getGeneDescriptor(subgene).orElse(new GeneDescriptor(null, "")).getName().equals(name)) {
+         return Optional.of(subgene);
+       }
+      }
+      return Optional.empty();
+    }
+    
+    public GeneBuilder setAllele(String name, Object value) {
+      getGene(name).ifPresent((Gene thisGene) -> thisGene.setAllele(value));
+      return this;
+    }
     
   }
 
   public enum GeneType {
-    COMPOSITE, BOOLEAN, INT, DOUBLE, STRING
+    COMPOSITE, BOOLEAN, INT, DOUBLE, STRING, BINARY
   }
 
-  private Configuration configuration;
-  private Class<T> clazz;
-
-  public GeneCompositor(Class<T> clazz) {
-    this.configuration = null;
-    this.clazz = clazz;
-  }
+  private final Configuration configuration;
+  private final Class<T> clazz;
 
   public GeneCompositor(Class<T> clazz, Configuration configuration) {
     this.clazz = clazz;
-    this.configuration = configuration;
-  }
-
-  public void setConficuration(Configuration configuration) {
     this.configuration = configuration;
   }
 
@@ -116,6 +132,10 @@ public abstract class GeneCompositor<T> {
 
   protected GeneBuilder buildGene(String name) throws InvalidConfigurationException {
     return new GeneBuilder(name);
+  }
+  
+  protected GeneBuilder wrapGene(String name, CompositeGene gene) throws InvalidConfigurationException {
+    return new GeneBuilder(name, gene);
   }
   
   public abstract CompositeGene compose(T obj) throws InvalidConfigurationException;
