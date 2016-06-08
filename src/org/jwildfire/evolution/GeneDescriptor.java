@@ -5,6 +5,7 @@
  */
 package org.jwildfire.evolution;
 
+import java.util.Optional;
 import org.jgap.Gene;
 
 /**
@@ -13,8 +14,13 @@ import org.jgap.Gene;
  */
 public class GeneDescriptor {
 
-  public static GeneDescriptor ofGene(Gene gene) {
-    return (GeneDescriptor) gene.getApplicationData();
+  public static Optional<GeneDescriptor> ofGene(Gene gene) {
+    Object appData = gene.getApplicationData();
+    if(appData != null && appData instanceof GeneDescriptor) {
+      return Optional.ofNullable((GeneDescriptor) appData);
+    } else {
+      return Optional.empty();
+    }
   }
   
   private final GeneCompositor.GeneType type;
