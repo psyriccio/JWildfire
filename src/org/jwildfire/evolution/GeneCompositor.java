@@ -5,6 +5,7 @@
  */
 package org.jwildfire.evolution;
 
+import java.util.HashMap;
 import java.util.Optional;
 import org.jgap.Configuration;
 import org.jgap.InvalidConfigurationException;
@@ -25,6 +26,76 @@ public abstract class GeneCompositor<T> {
 
   public static Optional<GeneDescriptor> getGeneDescriptor(Gene gene) {
     return GeneDescriptor.ofGene(gene);
+  }
+  
+  public class GeneParser {
+    
+    private final Gene gene;
+    private final HashMap<String, Object> items; 
+    private final Object value;
+            
+    public GeneParser(Gene gene) {
+      this.gene = gene;
+      if(gene instanceof CompositeGene) {
+        CompositeGene cGene = (CompositeGene) gene;
+        value = gene;
+        items = new HashMap<>();
+        cGene.getGenes().stream().forEach((subGene) -> {
+          String name = getGeneDescriptor(subGene).orElse(new GeneDescriptor(GeneType.INT, "")).getName();
+          items.put(name, subGene);
+        });
+      } else {
+        value = gene.getAllele();
+        items = null;
+      }
+    }
+    
+    public Object val() {
+      return value;
+    }
+    
+    public int intVal() {
+      return (int) value;
+    }
+    
+    public double doubleVal() {
+      return (double) value;
+    }
+    
+    public String stringVal() {
+      return (String) value;
+    }
+    
+    public boolean boolVal() {
+      return (boolean) value;
+    }
+    
+    public GeneType type() {
+      return getGeneDescriptor(gene).orElse(new GeneDescriptor(null, "")).getType();
+    }
+    
+    public GeneParser get(String name) {
+      String names[];
+      if(name.contains("/")) {
+        names = name.split("/");
+      } else {
+        return new GeneParser((Gene) items.get(name));
+      }
+      
+      GeneParser ret = null;
+      for(String nameVal : names) {
+        if(ret == null) {
+          ret = new GeneParser((Gene) items.get(name));
+        } else {
+          ret = ret.get(nameVal);
+        }
+        return ret;
+      }
+      
+      return null;
+      
+    }
+    
   }
   
   public class GeneBuilder {
@@ -112,6 +183,13 @@ public abstract class GeneCompositor<T> {
       return this;
     }
     
+    public GeneBuilder val(Object value) {
+      gene.getGenes().get(
+              gene.getGenes().size()-1
+      ).setAllele(value);
+      return this;
+    }
+    
   }
 
   public enum GeneType {
@@ -136,6 +214,10 @@ public abstract class GeneCompositor<T> {
   
   protected GeneBuilder wrapGene(String name, CompositeGene gene) throws InvalidConfigurationException {
     return new GeneBuilder(name, gene);
+  }
+  
+  protected GeneParser parseGene(CompositeGene gene) {
+    return new GeneParser(gene);
   }
   
   public abstract CompositeGene compose(T obj) throws InvalidConfigurationException;
