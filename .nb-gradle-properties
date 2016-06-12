@@ -12,4 +12,9 @@
       <task-jvm-args/>
     </task>
   </common-tasks>
+  <license-header>
+    <name>GNU Lesser General Public License version 2.1</name>
+    <template>license-lgpl21.txt</template>
+    <property name="organization">John Gleezowood (psyriccio@gmail.com)</property>
+  </license-header>
 </gradle-project-properties>
