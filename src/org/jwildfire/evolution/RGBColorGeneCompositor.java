@@ -31,7 +31,10 @@ public class RGBColorGeneCompositor extends GeneCompositor<RGBColor> {
 
   @Override
   public void decompose(CompositeGene gene, RGBColor obj) throws InvalidConfigurationException {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    GeneParser parser = parseGene(gene);
+    obj.setRed(parser.get("RED").intVal());
+    obj.setGreen(parser.get("GREEN").intVal());
+    obj.setBlue(parser.get("BLUE").intVal());
   }
 
 
