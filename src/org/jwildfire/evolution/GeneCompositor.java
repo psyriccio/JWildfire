@@ -54,7 +54,7 @@ public abstract class GeneCompositor<T> {
         value = gene;
         items = new HashMap<>();
         cGene.getGenes().stream().forEach((subGene) -> {
-          String name = getGeneDescriptor(subGene).orElse(new GeneDescriptor(GeneType.INT, "")).getName();
+          String name = getGeneDescriptor(subGene).orElse(new GeneDescriptor(subGene, GeneCompositor.this, GeneType.INT, "")).getName();
           items.put(name, subGene);
         });
       } else {
@@ -84,7 +84,7 @@ public abstract class GeneCompositor<T> {
     }
     
     public GeneType type() {
-      return getGeneDescriptor(gene).orElse(new GeneDescriptor(null, "")).getType();
+      return getGeneDescriptor(gene).orElse(new GeneDescriptor(null, GeneCompositor.this, null, "")).getType();
     }
     
     public GeneParser get(String name) {
@@ -117,12 +117,12 @@ public abstract class GeneCompositor<T> {
 
     public GeneBuilder(String name) throws InvalidConfigurationException {
       gene = new CompositeGene(getConfiguration());
-      gene.setApplicationData(new GeneDescriptor(GeneType.COMPOSITE, name));
+      gene.setApplicationData(new GeneDescriptor(gene, GeneCompositor.this, GeneType.COMPOSITE, name));
     }
 
     public GeneBuilder(String name, CompositeGene gene) throws InvalidConfigurationException {
       this.gene = gene;
-      gene.setApplicationData(new GeneDescriptor(GeneType.COMPOSITE, name));
+      gene.setApplicationData(new GeneDescriptor(gene, GeneCompositor.this, GeneType.COMPOSITE, name));
     }
     
     public CompositeGene build() {
@@ -163,9 +163,11 @@ public abstract class GeneCompositor<T> {
           int length = min != null ? (int) min : (int) max;
           newGene = new FixedBinaryGene(configuration, length);
           break;
+        case FLAG:
+          newGene = new BooleanGene(getConfiguration());
         default:
       }
-      gene.setApplicationData(new GeneDescriptor(type, name));
+      gene.setApplicationData(new GeneDescriptor(gene, GeneCompositor.this, GeneDescriptor.ofGene(gene).orElse(null), type, name));
       gene.addGene(newGene);
       return this;
     }
@@ -184,29 +186,52 @@ public abstract class GeneCompositor<T> {
    
     protected Optional<Gene> getGene(String name) {
       for(Gene subgene : gene.getGenes()) {
-       if(getGeneDescriptor(subgene).orElse(new GeneDescriptor(null, "")).getName().equals(name)) {
-         return Optional.of(subgene);
-       }
+        if(getGeneDescriptor(subgene).orElse(new GeneDescriptor(null, GeneCompositor.this, null, "")).getName().equals(name)) {
+          return Optional.of(subgene);
+        }
       }
       return Optional.empty();
     }
     
     public GeneBuilder setAllele(String name, Object value) {
-      getGene(name).ifPresent((Gene thisGene) -> thisGene.setAllele(value));
+      getGene(name).ifPresent((Gene thisGene) -> {
+        GeneDescriptor descr = getGeneDescriptor(thisGene).get();
+        if(!descr.isImmutable()) {
+          thisGene.setAllele(value);
+          if(descr.getType() == GeneType.FLAG && !descr.isDisabled() && !descr.isNull()) {
+            descr.getDistributedFlags().forEach((GeneFlag flag) -> {
+              descr.getParent().putFlagValue(flag, (boolean) value);
+            });
+          }
+        }
+      });
       return this;
     }
     
     public GeneBuilder val(Object value) {
-      gene.getGenes().get(
+      Gene curGene = gene.getGenes().get( 
               gene.getGenes().size()-1
-      ).setAllele(value);
+      );
+      GeneDescriptor descr = getGeneDescriptor(curGene).get();
+      if(!descr.isImmutable() && !descr.isNull()) {
+        curGene.setAllele(value);
+        if(descr.getType() == GeneType.FLAG && !descr.isDisabled()) {
+          descr.getDistributedFlags().forEach((GeneFlag flag) -> {
+            descr.getParent().putFlagValue(flag, (boolean) value);
+          });
+        }
+      }
       return this;
     }
     
   }
 
   public enum GeneType {
-    COMPOSITE, BOOLEAN, INT, DOUBLE, STRING, BINARY
+    COMPOSITE, BOOLEAN, INT, DOUBLE, STRING, BINARY, FLAG
+  }
+  
+  public enum GeneFlag {
+    DISABLED, IMMUTABLE, HIDDEN, NULL, CORRUPTED
   }
 
   private final Configuration configuration;
