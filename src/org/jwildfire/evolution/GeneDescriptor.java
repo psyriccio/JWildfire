@@ -217,6 +217,10 @@ public class GeneDescriptor {
     return thisGene;
   }
   
+  public GeneSelector select(String query) {
+    return new GeneSelector(this).select(query);
+  }
+  
   @Override
   public String toString() {
     return name + "@" + Integer.toHexString(this.hashCode()) + ":(" + type.toString() + ")";
